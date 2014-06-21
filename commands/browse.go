@@ -6,6 +6,7 @@ import (
 	"github.com/jingweno/gh/utils"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strings"
 )
 
@@ -94,6 +95,12 @@ func browse(command *Command, args *Args) {
 		if !reflect.DeepEqual(branch, master) && branch.IsRemote() {
 			subpage = fmt.Sprintf("tree/%s", branchInURL(branch))
 		}
+	}
+
+	r, _ := regexp.Compile(`(commits|tree|blob|settings)`)
+	if flagBrowseProject == "" && !r.MatchString(subpage) {
+		project, err = localRepo.MainProject()
+		utils.Check(err)
 	}
 
 	pageUrl := project.WebURL("", "", subpage)
